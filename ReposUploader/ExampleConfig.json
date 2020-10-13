@@ -1,0 +1,17 @@
+{
+  "binPath": "c:\\sourcecode\\app\\bin\\release",
+  "ftpAddress": "azure.net",
+  "ftpAppDir": "site/wwwroot/myreleasefolder",
+  "ftpUser": "userfoo",
+  "ftpPassword": "passbar",
+  "AppEntryPoint": "app.exe",
+  "AppFullName": "Sample Application Name",
+  "PublisherName": "example software llc",
+  "PublisherWeb": "site.com",
+  "PublisherSupport": "site.com/support",
+  "PublisherSupportPhone": "+52 9876543210",
+  "PublisherSupportMail": "support@mail.com",
+  "GlobalHashLocation": "c:\\sourcecode\\globalHash.json",
+  "ForbbidenDirectories": "zh-CHS,zh-CHT,pt,ja",
+  "ForbbidenExtensions": "xml,pdb,config,locked"
+}
