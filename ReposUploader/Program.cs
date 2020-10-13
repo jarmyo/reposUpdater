@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -12,15 +13,19 @@ namespace ReposUploader
 {
     internal class Program
     {
+        private static Stopwatch timer;
         private static bool AutoClose = true;
         private static bool ForceUploadAll = false;
         private static bool NoUpload = false;
         private static readonly JavaScriptSerializer JsonConvert = new JavaScriptSerializer();
+        
         private static Dictionary<string, string> GlobalParams;
-        private static string[] ForbbidenDirectories;
-        private static string[] ForbbidenExtensions;
         private static Dictionary<string, string> newHashSet;
         private static Dictionary<string, string> prevHashSet;
+
+        private static string[] ForbbidenDirectories;
+        private static string[] ForbbidenExtensions;
+
         private static int CounterFilesChecked = 0;
         private static int CounterFilesZiped = 0;
         private static int CounterFilesUploaded = 0;
@@ -88,7 +93,7 @@ namespace ReposUploader
         {
 
             PrepareDirectories();
-
+            timer = Stopwatch.StartNew();
             newHashSet = new Dictionary<string, string>();
 
             if (!ForceUploadAll)
@@ -104,9 +109,6 @@ namespace ReposUploader
             var _binaryDirectory = new DirectoryInfo(GlobalParams["binPath"]);
 
             var pack = new DeployPack();
-
-
-
             CounterFilesChecked = 0;
             CounterFilesZiped = 0;
             CounterFilesUploaded = 0;
@@ -226,8 +228,8 @@ namespace ReposUploader
 
             if (ForceUploadAll || !_noFileChanges)
             {
-                Console.WriteLine();
-                Console.Write(f.Name + " - " + f.Length + " .");
+                // Console.WriteLine();
+                Console.Write(timer.Elapsed.ToString() + " " + f.Name + " - " + f.Length + "b .");
 
                 f.CopyTo(completePath);
                 //////////// ZIP //////////////////
@@ -245,7 +247,7 @@ namespace ReposUploader
                 if (!NoUpload)
                 {
                     var _rutaArriba = "ftp://" + GlobalParams["ftpAddress"] + "/" + GlobalParams["ftpAppDir"] + "/release/" + _directory.Replace("\\", "/") + f.Name;
-                    UploadToFTP(completePath, _rutaArriba);
+                    UploadToFTP(completePath + ".zip", _rutaArriba + ".zip");
                 }
             }
             else
@@ -260,13 +262,13 @@ namespace ReposUploader
         private static void UploadToFTP(string completePath, string _rutaArriba)
         {
 
-            FtpWebRequest request = (FtpWebRequest)WebRequest.Create(_rutaArriba + ".zip");
+            FtpWebRequest request = (FtpWebRequest)WebRequest.Create(_rutaArriba);
             request.Method = WebRequestMethods.Ftp.UploadFile;
             request.Credentials = new NetworkCredential(GlobalParams["ftpUser"], GlobalParams["ftpPassword"]);
 
             // Copy the contents of the file to the request stream.
             byte[] fileContents;
-            using (StreamReader sourceStream = new StreamReader(completePath + ".zip"))
+            using (StreamReader sourceStream = new StreamReader(completePath))
             {
                 fileContents = Encoding.UTF8.GetBytes(sourceStream.ReadToEnd());
             }
@@ -279,10 +281,10 @@ namespace ReposUploader
             }
 
             using (FtpWebResponse response = (FtpWebResponse)request.GetResponse())
-            {                
-                Console.Write(response.StatusDescription);
+            {
+                Console.Write(" " + response.StatusDescription);
             }
-            CounterFilesUploaded++;            
+            CounterFilesUploaded++;
         }
 
         public static MD5 md5 = MD5.Create();
