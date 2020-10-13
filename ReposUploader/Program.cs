@@ -227,7 +227,7 @@ namespace ReposUploader
             if (ForceUploadAll || !_noFileChanges)
             {
                 Console.WriteLine();
-                Console.Write(completePath + " - " + f.Length + " .");
+                Console.Write(f.Name + " - " + f.Length + " .");
 
                 f.CopyTo(completePath);
                 //////////// ZIP //////////////////
@@ -280,7 +280,7 @@ namespace ReposUploader
 
             using (FtpWebResponse response = (FtpWebResponse)request.GetResponse())
             {                
-                Console.WriteLine(response.StatusDescription);
+                Console.Write(response.StatusDescription);
             }
             CounterFilesUploaded++;            
         }
