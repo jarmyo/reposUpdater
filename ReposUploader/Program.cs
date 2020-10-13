@@ -1,85 +1,90 @@
-﻿using FluentFTP;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Net;
-using System.Security.Authentication;
 using System.Security.Cryptography;
+using System.Text;
 using System.Web.Script.Serialization;
 
 namespace ReposUploader
 {
-    class Program
+    internal class Program
     {
-        static bool AutoClose = true;
-        static bool ForceUploadAll = false;
-        static bool NoUpload = false;
-        static JavaScriptSerializer JsonConvert;
-        static Dictionary<string, string> GlobalParams;
-        static string[] ForbbidenDirectories;
-        static string[] ForbbidenExtensions;
-        static void Main(string[] args)
-        {
-            JsonConvert = new JavaScriptSerializer();
-            //the config file must be in the same location as this executable
-            var configjson = File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + "\\Config.json");
-            GlobalParams = JsonConvert.Deserialize<Dictionary<string, string>>(configjson);
-
-            ForbbidenDirectories = GlobalParams["ForbbidenDirectories"].Split(',');
-            ForbbidenExtensions = GlobalParams["ForbbidenExtensions"].Split(',');
-
-            //Load sensitive data from a json file
-
-                foreach (var arg in args)
-                {
-                    if (arg == "/force")
-                    {
-                        ForceUploadAll = true;
-                    }
-                    if (arg == "/noupload")
-                    {
-                        NoUpload = true;
-                    }
-                    if (arg == "/noclose")
-                    {
-                        AutoClose = false;
-                    }
-                }
-
-            CreateUpdatePAck();
-        }
-
+        private static bool AutoClose = true;
+        private static bool ForceUploadAll = false;
+        private static bool NoUpload = false;
+        private static readonly JavaScriptSerializer JsonConvert = new JavaScriptSerializer();
+        private static Dictionary<string, string> GlobalParams;
+        private static string[] ForbbidenDirectories;
+        private static string[] ForbbidenExtensions;
         private static Dictionary<string, string> newHashSet;
         private static Dictionary<string, string> prevHashSet;
+        private static int CounterFilesChecked = 0;
+        private static int CounterFilesZiped = 0;
+        private static int CounterFilesUploaded = 0;
 
-
-        static int CounterFilesPacked = 0;
-        static int CounterFilesZiped = 0;
-        static int CounterFilesUploaded = 0;
-
+        private static void Main(string[] args)
+        {
+            LoadConfig();
+            CheckParams(args);
+            CreateUpdatePack();
+        }
+        private static void LoadConfig()
+        {
+            //the config file must be in the same location as this executable
+            //TODO: check if file exist
+            var configjson = File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + "\\Config.json");
+            GlobalParams = JsonConvert.Deserialize<Dictionary<string, string>>(configjson);
+            //message if no directories or extensions are defined
+            ForbbidenDirectories = GlobalParams["ForbbidenDirectories"].Split(',');
+            ForbbidenExtensions = GlobalParams["ForbbidenExtensions"].Split(',');
+            //TODO: if ftp password is not defined, ask for it in the console input
+            //TODO: some params are required, so check.
+        }
+        private static void CheckParams(string[] args)
+        {
+            foreach (var arg in args)
+            {
+                if (arg == "/force")
+                {
+                    ForceUploadAll = true;
+                }
+                if (arg == "/noupload")
+                {
+                    NoUpload = true;
+                }
+                if (arg == "/noclose")
+                {
+                    AutoClose = false;
+                }
+            }
+        }
         private static void PrepareDirectories()
         {
             var tempDirectory = new DirectoryInfo(Path.GetTempPath() + @"\tempOut\release");
-            Debug.Write(tempDirectory.FullName);
+            Console.WriteLine("working directory: " + tempDirectory.FullName);
             if (!tempDirectory.Exists)
+            {
                 tempDirectory.Create();
+            }
+            else
+            {
+                Console.Write("clear temp directory");
+                foreach (FileInfo file in tempDirectory.GetFiles())
+                {
+                    file.Delete();
+                }
+                foreach (DirectoryInfo dir in tempDirectory.GetDirectories())
+                {
+                    dir.Delete(true);
+                }
+                Console.WriteLine("...OK");
+            }
 
-            Console.Write("clear temp file");
-            foreach (FileInfo file in tempDirectory.GetFiles())
-            {
-                file.Delete();
-            }
-            foreach (DirectoryInfo dir in tempDirectory.GetDirectories())
-            {
-                dir.Delete(true);
-            }
-            Console.WriteLine("...OK");
         }
-
-        public static void CreateUpdatePAck()
+        public static void CreateUpdatePack()
         {
 
             PrepareDirectories();
@@ -87,128 +92,123 @@ namespace ReposUploader
             newHashSet = new Dictionary<string, string>();
 
             if (!ForceUploadAll)
+            {
+                //TODO: check if file exist
                 prevHashSet = JsonConvert.Deserialize<Dictionary<string, string>>(File.ReadAllText(GlobalParams["GlobalHashLocation"]));
+            }
             else
+            {
                 prevHashSet = new Dictionary<string, string>();
-
+            }
 
             var _binaryDirectory = new DirectoryInfo(GlobalParams["binPath"]);
-            
+
             var pack = new DeployPack();
 
-            using (var client = new FtpClient(GlobalParams["ftpAddress"]))
+
+
+            CounterFilesChecked = 0;
+            CounterFilesZiped = 0;
+            CounterFilesUploaded = 0;
+
+            var _dir = GetDir(_binaryDirectory);
+
+            pack.PackFiles = _dir.PackFiles;
+            pack.PackDirs = _dir.PackDirs;
+            pack.Size = _dir.Size;
+
+            var dt = DateTime.Now;
+            pack.DateTime = dt;
+
+            //version number in repos is in base of date of compilation because we have a lot of builds
+            pack.MainVer = new Version(dt.Year - 2016, dt.Month, dt.Day, (dt.Hour * 60 + dt.Minute)).ToString();
+
+            pack.EntryPoint = GlobalParams["AppEntryPoint"];
+            pack.ProgramFullName = GlobalParams["AppFullName"];
+
+            var pub = new PublisherInfo();
+            pub.Name = GlobalParams["PublisherName"];
+            pub.SupportLink = GlobalParams["PublisherSupport"];
+            pub.SupportMail = GlobalParams["PublisherSupportMail"];
+            pub.SupportPhone = GlobalParams["PublisherSupportPhone"];
+            pub.WebLink = GlobalParams["PublisherWeb"];
+            pack.Publisher = pub;
+
+            var result = JsonConvert.Serialize(pack);
+
+            File.WriteAllText(Path.GetTempPath() + @"\tempOut\local.json", result);
+
+            if (CounterFilesUploaded > 0)
             {
+                var hashes = JsonConvert.Serialize(newHashSet);
+                File.WriteAllText(GlobalParams["GlobalHashLocation"], hashes);
                 if (!NoUpload)
                 {
-                    //change this config in order to best performance of your ftp server
-                    client.Credentials = new NetworkCredential(GlobalParams["ftpUser"], GlobalParams["ftpPassword"]);
-                    client.SslProtocols = SslProtocols.Tls;
-                    client.ValidateAnyCertificate = true;
-                    client.DataConnectionType = FtpDataConnectionType.PASV;
-                    client.DownloadDataType = FtpDataType.Binary;
-                    client.RetryAttempts = 5;
-                    client.SocketPollInterval = 1000;
-                    client.ConnectTimeout = 2000;
-                    client.ReadTimeout = 2000;
-                    client.DataConnectionConnectTimeout = 2000;
-                    client.DataConnectionReadTimeout = 2000;
-                    client.Connect();
+                    UploadToFTP(Path.GetTempPath() + @"\tempOut\local.json", "ftp://" + GlobalParams["ftpAddress"] + "/" + GlobalParams["ftpAppDir"] + "/local.json.deploy");
                 }
+            }
+            Console.WriteLine("Ready, " + CounterFilesChecked + " checked, " + CounterFilesZiped + " zipped, " + CounterFilesUploaded + " uploaded");
 
-                CounterFilesPacked = 0;
-                CounterFilesZiped = 0;
-                CounterFilesUploaded = 0;
 
-                var _dir = GetDir(client, _binaryDirectory, "");
-
-                pack.PackFiles = _dir.PackFiles;
-                pack.PackDirs = _dir.PackDirs;
-                pack.Size = _dir.Size;
-
-                var dt = DateTime.Now;
-                pack.DateTime = dt;
-                pack.MainVer = new Version(dt.Year - 2016, dt.Month, dt.Day, ((int)(dt.Hour * 60) + dt.Minute)).ToString();
-                pack.EntryPoint = GlobalParams["AppEntryPoint"];
-                pack.ProgramFullName = GlobalParams["AppFullName"];
-
-                var pub = new PublisherInfo();
-                pub.Name = GlobalParams["PublisherName"];
-                pub.SupportLink = GlobalParams["PublisherSupport"];
-                pub.SupportMail = GlobalParams["PublisherSupportMail"];
-                pub.SupportPhone = GlobalParams["PublisherSupportPhone"];
-                pub.WebLink = GlobalParams["PublisherWeb"];
-                pack.Publisher = pub;
-
-                var result = JsonConvert.Serialize(pack);
-
-                File.WriteAllText(Path.GetTempPath() + @"\tempOut\local.json", result);
-
-                if (CounterFilesUploaded > 0)
-                {
-                    var hashes = JsonConvert.Serialize(newHashSet);
-                    File.WriteAllText(GlobalParams["GlobalHashLocation"], hashes);
-                  if (!NoUpload)
-                    client.UploadFile(Path.GetTempPath() + @"\tempOut\local.json", GlobalParams["ftpAppDir"] + "/local.json.deploy", FtpRemoteExists.Overwrite, false, FtpVerify.Retry);
-
-                }
-                Console.WriteLine("Ready, " + CounterFilesPacked + " checked, " + CounterFilesZiped + " zipped, " + CounterFilesUploaded + " uploaded");
-                
-                if (!NoUpload)
-                    client.Disconnect();
-
-                if (!AutoClose)
-                    Console.ReadKey();
+            if (!AutoClose)
+            {
+                Console.ReadKey();
             }
         }
-        public static PackDir GetDir(FtpClient client, DirectoryInfo _dir, string _directorio = "")
+        public static PackDir GetDir(DirectoryInfo _dir, string _directory = "")
         {
-            if (_directorio != "")
-                _directorio += "\\";
+            if (_directory != "")
+            {
+                _directory += "\\";
+            }
 
-            long _tamañoDir = 0;
-            var _esteDir = new PackDir
+            long DirectorySize = 0;
+            var _thisPackDir = new PackDir
             {
                 Name = _dir.Name
             };
 
-            var directorioAbajo = new DirectoryInfo(Path.GetTempPath() + @"\tempOut\release\" + _directorio);
-            if (!directorioAbajo.Exists)
+            var _localDirectory = new DirectoryInfo(Path.GetTempPath() + @"\tempOut\release\" + _directory);
+            if (!_localDirectory.Exists)
             {
-                directorioAbajo.Create();
+                _localDirectory.Create();
             }
 
             foreach (var _archivoBuild in _dir.GetFiles())
             {
                 if (!ForbbidenExtensions.Contains(_archivoBuild.Extension))
                 {
-                    var g1 = CheckFile(client, _archivoBuild, _directorio);
-                    _tamañoDir += g1.Size;
-                    _esteDir.PackFiles.Add(g1);
+                    var g1 = CheckFile(_archivoBuild, _directory);
+                    DirectorySize += g1.Size;
+                    _thisPackDir.PackFiles.Add(g1);
                 }
             }
 
             foreach (var _subdirectorioBuild in _dir.GetDirectories())
             {
                 if (ForbbidenDirectories.Contains(_subdirectorioBuild.Name))
+                {
                     continue;
+                }
 
-                var g = GetDir(client, _subdirectorioBuild, _directorio + _subdirectorioBuild.Name);
-                _tamañoDir += g.Size;
-                _esteDir.PackDirs.Add(g);
+                var g = GetDir(_subdirectorioBuild, _directory + _subdirectorioBuild.Name);
+                DirectorySize += g.Size;
+                _thisPackDir.PackDirs.Add(g);
             }
 
-            _esteDir.Size = _tamañoDir;
+            _thisPackDir.Size = DirectorySize;
 
-            return _esteDir;
+            return _thisPackDir;
 
         }
-
-        public static PackFile CheckFile(FtpClient client, FileInfo f, string _directorio = "")
+        public static PackFile CheckFile(FileInfo f, string _directory = "")
         {
-            if (_directorio != "")
-                _directorio += "\\";
+            if (_directory != "")
+            {
+                _directory += "\\";
+            }
 
-            var _rutaTotal = Path.GetTempPath() + @"\tempOut\release\" + _directorio + f.Name;
+            var completePath = Path.GetTempPath() + @"\tempOut\release\" + _directory + f.Name;
 
             var p1 = new PackFile()
             {
@@ -218,45 +218,71 @@ namespace ReposUploader
             };
 
 
-            newHashSet.Add(_rutaTotal, p1.Hash);
-            var _esigual = prevHashSet.ContainsKey(_rutaTotal)
-               && prevHashSet[_rutaTotal] == p1.Hash;
+            newHashSet.Add(completePath, p1.Hash);
+            var _noFileChanges = prevHashSet.ContainsKey(completePath)
+               && prevHashSet[completePath] == p1.Hash;
 
-            CounterFilesPacked++;
+            CounterFilesChecked++;
 
-            if (ForceUploadAll || !_esigual)
+            if (ForceUploadAll || !_noFileChanges)
             {
                 Console.WriteLine();
-                Console.Write(_rutaTotal + " - " + f.Length + " . ");
+                Console.Write(completePath + " - " + f.Length + " .");
 
-                f.CopyTo(_rutaTotal);
+                f.CopyTo(completePath);
                 //////////// ZIP //////////////////
-                using (ZipArchive archive = ZipFile.Open(_rutaTotal + ".zip", ZipArchiveMode.Update))
+                using (ZipArchive archive = ZipFile.Open(completePath + ".zip", ZipArchiveMode.Update))
                 {
-                    archive.CreateEntryFromFile(_rutaTotal, f.Name, CompressionLevel.Optimal);
+                    archive.CreateEntryFromFile(completePath, f.Name, CompressionLevel.Optimal);
                 }
                 Console.Write(" zip");
-                var f2 = new FileInfo(_rutaTotal);
+                var f2 = new FileInfo(completePath);
                 f2.Delete();
                 CounterFilesZiped++;
 
                 //////////// UPLOAD //////////////////
 
-                var _rutaArriba = GlobalParams["ftpAppDir"] + "/release/" + _directorio.Replace("\\", "/") + f.Name;
                 if (!NoUpload)
                 {
-                    client.UploadFile(_rutaTotal + ".zip", _rutaArriba + ".zip", FtpRemoteExists.Overwrite, true, FtpVerify.None);
-                    CounterFilesUploaded++;
-                    Console.WriteLine(" up");
+                    var _rutaArriba = "ftp://" + GlobalParams["ftpAddress"] + "/" + GlobalParams["ftpAppDir"] + "/release/" + _directory.Replace("\\", "/") + f.Name;
+                    UploadToFTP(completePath, _rutaArriba);
                 }
             }
             else
             {
-                Console.Write(" . ");
+                Console.Write(".");
             }
-            //Console.WriteLine();
 
             return p1;
+        }
+
+
+        private static void UploadToFTP(string completePath, string _rutaArriba)
+        {
+
+            FtpWebRequest request = (FtpWebRequest)WebRequest.Create(_rutaArriba + ".zip");
+            request.Method = WebRequestMethods.Ftp.UploadFile;
+            request.Credentials = new NetworkCredential(GlobalParams["ftpUser"], GlobalParams["ftpPassword"]);
+
+            // Copy the contents of the file to the request stream.
+            byte[] fileContents;
+            using (StreamReader sourceStream = new StreamReader(completePath + ".zip"))
+            {
+                fileContents = Encoding.UTF8.GetBytes(sourceStream.ReadToEnd());
+            }
+
+            request.ContentLength = fileContents.Length;
+
+            using (Stream requestStream = request.GetRequestStream())
+            {
+                requestStream.Write(fileContents, 0, fileContents.Length);
+            }
+
+            using (FtpWebResponse response = (FtpWebResponse)request.GetResponse())
+            {                
+                Console.WriteLine(response.StatusDescription);
+            }
+            CounterFilesUploaded++;            
         }
 
         public static MD5 md5 = MD5.Create();
@@ -265,6 +291,5 @@ namespace ReposUploader
             var hash = md5.ComputeHash(stream);
             return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
         }
-
     }
 }
