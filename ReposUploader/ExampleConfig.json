@@ -13,5 +13,5 @@
   "PublisherSupportMail": "support@mail.com",
   "GlobalHashLocation": "c:\\sourcecode\\globalHash.json",
   "ForbbidenDirectories": "zh-CHS,zh-CHT,pt,ja",
-  "ForbbidenExtensions": "xml,pdb,config,locked"
+  "ForbbidenExtensions": ".xml,.pdb,.config,.locked"
 }

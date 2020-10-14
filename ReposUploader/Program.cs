@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using System.Web.Script.Serialization;
 
 namespace ReposUploader
@@ -261,31 +262,173 @@ namespace ReposUploader
 
         private static void UploadToFTP(string completePath, string _rutaArriba)
         {
+            ManualResetEvent waitObject;
 
+            FtpState state = new FtpState();
             FtpWebRequest request = (FtpWebRequest)WebRequest.Create(_rutaArriba);
             request.Method = WebRequestMethods.Ftp.UploadFile;
+
             request.Credentials = new NetworkCredential(GlobalParams["ftpUser"], GlobalParams["ftpPassword"]);
 
-            // Copy the contents of the file to the request stream.
-            byte[] fileContents;
-            using (StreamReader sourceStream = new StreamReader(completePath))
+            // Store the request in the object that we pass into the
+            // asynchronous operations.
+            state.Request = request;
+            state.FileName = completePath;
+
+            // Get the event to wait on.
+            waitObject = state.OperationComplete;
+
+            // Asynchronously get the stream for the file contents.
+            request.BeginGetRequestStream(
+                new AsyncCallback(EndGetStreamCallback),
+                state
+            );
+
+            // Block the current thread until all operations are complete.
+            waitObject.WaitOne();
+
+            // The operations either completed or threw an exception.
+            if (state.OperationException != null)
             {
-                fileContents = Encoding.UTF8.GetBytes(sourceStream.ReadToEnd());
+                throw state.OperationException;
+            }
+            else
+            {
+                Console.WriteLine("The operation completed - {0}", state.StatusDescription);
             }
 
-            request.ContentLength = fileContents.Length;
 
-            using (Stream requestStream = request.GetRequestStream())
-            {
-                requestStream.Write(fileContents, 0, fileContents.Length);
-            }
+            //FtpWebRequest request = (FtpWebRequest)WebRequest.Create(_rutaArriba);
+            //request.Method = WebRequestMethods.Ftp.UploadFile; 
+            //request.Credentials = new NetworkCredential(GlobalParams["ftpUser"], GlobalParams["ftpPassword"]);
 
-            using (FtpWebResponse response = (FtpWebResponse)request.GetResponse())
-            {
-                Console.Write(" " + response.StatusDescription);
-            }
+            //// Copy the contents of the file to the request stream.
+            //byte[] fileContents;
+            //using (StreamReader sourceStream = new StreamReader(completePath))
+            //{
+            //    fileContents = Encoding.UTF32.GetBytes(sourceStream.ReadToEnd());
+            //}
+
+            //request.ContentLength = fileContents.Length;
+
+            //using (Stream requestStream = request.GetRequestStream())
+            //{
+            //    requestStream.Write(fileContents, 0, fileContents.Length);
+            //}
+
+            //using (FtpWebResponse response = (FtpWebResponse)request.GetResponse())
+            //{
+            //    Console.Write(" " + response.StatusDescription);
+            //}
             CounterFilesUploaded++;
         }
+
+        public class FtpState
+        {
+            private ManualResetEvent wait;
+            private FtpWebRequest request;
+            private string fileName;
+            private Exception operationException = null;
+            string status;
+
+            public FtpState()
+            {
+                wait = new ManualResetEvent(false);
+            }
+
+            public ManualResetEvent OperationComplete
+            {
+                get { return wait; }
+            }
+
+            public FtpWebRequest Request
+            {
+                get { return request; }
+                set { request = value; }
+            }
+
+            public string FileName
+            {
+                get { return fileName; }
+                set { fileName = value; }
+            }
+            public Exception OperationException
+            {
+                get { return operationException; }
+                set { operationException = value; }
+            }
+            public string StatusDescription
+            {
+                get { return status; }
+                set { status = value; }
+            }
+        }
+
+        private static void EndGetStreamCallback(IAsyncResult ar)
+        {
+            FtpState state = (FtpState)ar.AsyncState;
+
+            Stream requestStream = null;
+            // End the asynchronous call to get the request stream.
+            try
+            {
+                requestStream = state.Request.EndGetRequestStream(ar);
+                // Copy the file contents to the request stream.
+                const int bufferLength = 2048;
+                byte[] buffer = new byte[bufferLength];
+                int count = 0;
+                int readBytes = 0;
+                FileStream stream = File.OpenRead(state.FileName);
+                do
+                {
+                    readBytes = stream.Read(buffer, 0, bufferLength);
+                    requestStream.Write(buffer, 0, readBytes);
+                    count += readBytes;
+                }
+                while (readBytes != 0);
+                Console.WriteLine("Writing {0} bytes to the stream.", count);
+                // IMPORTANT: Close the request stream before sending the request.
+                requestStream.Close();
+                // Asynchronously get the response to the upload request.
+                state.Request.BeginGetResponse(
+                    new AsyncCallback(EndGetResponseCallback),
+                    state
+                );
+            }
+            // Return exceptions to the main application thread.
+            catch (Exception e)
+            {
+                Console.WriteLine("Could not get the request stream.");
+                state.OperationException = e;
+                state.OperationComplete.Set();
+                return;
+            }
+        }
+
+
+
+        private static void EndGetResponseCallback(IAsyncResult ar)
+        {
+            FtpState state = (FtpState)ar.AsyncState;
+            FtpWebResponse response = null;
+            try
+            {
+                response = (FtpWebResponse)state.Request.EndGetResponse(ar);
+                response.Close();
+                state.StatusDescription = response.StatusDescription;
+                // Signal the main application thread that
+                // the operation is complete.
+                state.OperationComplete.Set();
+            }
+            // Return exceptions to the main application thread.
+            catch (Exception e)
+            {
+                Console.WriteLine("Error getting response.");
+                state.OperationException = e;
+                state.OperationComplete.Set();
+            }
+        }
+
 
         public static MD5 md5 = MD5.Create();
         public static string Hash(FileStream stream)
