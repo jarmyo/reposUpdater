@@ -45,7 +45,7 @@ namespace ReposUpdate
                         key.SetValue("Contact", Common.remote.Publisher.SupportMail);
                         key.SetValue("InstallDate", DateTime.Now.ToString("yyyyMMdd"));
                         key.SetValue("UninstallString", Common.InstalationPath + AppDomain.CurrentDomain.FriendlyName + @" /uninstall");
-                        key.SetValue("EstimatedSize", Common.bytesDownloaded, RegistryValueKind.DWord);
+                        key.SetValue("EstimatedSize", (Common.bytesDownloaded / 1024f) / 1024f, RegistryValueKind.DWord);
                     }
                     finally
                     {
@@ -90,7 +90,7 @@ namespace ReposUpdate
         {
             object shDesktop = "Desktop";
             WshShell shell = new WshShell();
-            string shortcutAddress = (string)shell.SpecialFolders.Item(ref shDesktop) + @"\repos.lnk";
+            string shortcutAddress = (string)shell.SpecialFolders.Item(ref shDesktop) + @"\"+ Common.remote.ProgramFullName + ".lnk";
             IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(shortcutAddress);
             shortcut.Description = Common.remote.ProgramFullName;
             shortcut.IconLocation = Common.InstalationPath + AppDomain.CurrentDomain.FriendlyName;

@@ -269,13 +269,9 @@ namespace ReposUploader
             request.Method = WebRequestMethods.Ftp.UploadFile;
 
             request.Credentials = new NetworkCredential(GlobalParams["ftpUser"], GlobalParams["ftpPassword"]);
-
-            // Store the request in the object that we pass into the
-            // asynchronous operations.
             state.Request = request;
             state.FileName = completePath;
 
-            // Get the event to wait on.
             waitObject = state.OperationComplete;
 
             // Asynchronously get the stream for the file contents.
@@ -297,29 +293,6 @@ namespace ReposUploader
                 Console.WriteLine("The operation completed - {0}", state.StatusDescription);
             }
 
-
-            //FtpWebRequest request = (FtpWebRequest)WebRequest.Create(_rutaArriba);
-            //request.Method = WebRequestMethods.Ftp.UploadFile; 
-            //request.Credentials = new NetworkCredential(GlobalParams["ftpUser"], GlobalParams["ftpPassword"]);
-
-            //// Copy the contents of the file to the request stream.
-            //byte[] fileContents;
-            //using (StreamReader sourceStream = new StreamReader(completePath))
-            //{
-            //    fileContents = Encoding.UTF32.GetBytes(sourceStream.ReadToEnd());
-            //}
-
-            //request.ContentLength = fileContents.Length;
-
-            //using (Stream requestStream = request.GetRequestStream())
-            //{
-            //    requestStream.Write(fileContents, 0, fileContents.Length);
-            //}
-
-            //using (FtpWebResponse response = (FtpWebResponse)request.GetResponse())
-            //{
-            //    Console.Write(" " + response.StatusDescription);
-            //}
             CounterFilesUploaded++;
         }
 
