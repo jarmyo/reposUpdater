@@ -19,6 +19,7 @@ namespace ReposUpdate
                 {
                     throw new Exception("Uninstall registry key not found.");
                 }
+
                 try
                 {
                     RegistryKey key = null;
@@ -68,8 +69,8 @@ namespace ReposUpdate
             {
                 encryptedKey.SetValue("version", nuevaVersion);
             }
-
         }
+
         public static void AddCertificate()
         {
             Console.Write("Instalando certificados de seguridad");
@@ -90,7 +91,7 @@ namespace ReposUpdate
         {
             object shDesktop = "Desktop";
             WshShell shell = new WshShell();
-            string shortcutAddress = (string)shell.SpecialFolders.Item(ref shDesktop) + @"\"+ Common.remote.ProgramFullName + ".lnk";
+            string shortcutAddress = (string)shell.SpecialFolders.Item(ref shDesktop) + @"\" + Common.remote.ProgramFullName + ".lnk";
             IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(shortcutAddress);
             shortcut.Description = Common.remote.ProgramFullName;
             shortcut.IconLocation = Common.InstalationPath + AppDomain.CurrentDomain.FriendlyName;
@@ -99,7 +100,3 @@ namespace ReposUpdate
         }
     }
 }
-
-
-
-

@@ -10,7 +10,7 @@ using static ReposUpdate.Common;
 namespace ReposUpdate
 {
     /// <summary>
-    /// Updater. 
+    /// Updater.
     /// </summary>
     public partial class App : Application
     {
@@ -29,9 +29,9 @@ namespace ReposUpdate
             }
             else
             {
-                InitEnvironment();
+                this.InitEnvironment();
 
-                if (FindNewVersion())
+                if (this.FindNewVersion())
                 {
                     Logger.Write("new version Found");
                     Current.MainWindow = new MainWindow();
@@ -66,6 +66,7 @@ namespace ReposUpdate
 
                     file.Delete();
                 }
+
                 foreach (DirectoryInfo dir in dclean.GetDirectories())
                 {
                     dir.Delete(true);
@@ -124,6 +125,7 @@ namespace ReposUpdate
                 File.Delete(Path_Update + updateFileName + ".json");
                 File.Delete(Path_Update + updateFileName + "_temp.json");
             }
+
             return false;
         }
 

@@ -7,9 +7,10 @@ namespace ReposUpdate
     {
         public DeployPack()
         {
-            PackFiles = new List<PackFile>();
-            PackDirs = new List<PackDir>();
+            this.PackFiles = new List<PackFile>();
+            this.PackDirs = new List<PackDir>();
         }
+
         public string MainVer { get; set; }
         public DateTime DateTime { get; set; }
         public long Size { get; set; }

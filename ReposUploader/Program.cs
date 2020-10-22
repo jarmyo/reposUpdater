@@ -19,7 +19,7 @@ namespace ReposUploader
         private static bool ForceUploadAll = false;
         private static bool NoUpload = false;
         private static readonly JavaScriptSerializer JsonConvert = new JavaScriptSerializer();
-        
+
         private static Dictionary<string, string> GlobalParams;
         private static Dictionary<string, string> newHashSet;
         private static Dictionary<string, string> prevHashSet;
@@ -37,6 +37,7 @@ namespace ReposUploader
             CheckParams(args);
             CreateUpdatePack();
         }
+
         private static void LoadConfig()
         {
             //the config file must be in the same location as this executable
@@ -49,6 +50,7 @@ namespace ReposUploader
             //TODO: if ftp password is not defined, ask for it in the console input
             //TODO: some params are required, so check.
         }
+
         private static void CheckParams(string[] args)
         {
             foreach (var arg in args)
@@ -57,16 +59,19 @@ namespace ReposUploader
                 {
                     ForceUploadAll = true;
                 }
+
                 if (arg == "/noupload")
                 {
                     NoUpload = true;
                 }
+
                 if (arg == "/noclose")
                 {
                     AutoClose = false;
                 }
             }
         }
+
         private static void PrepareDirectories()
         {
             var tempDirectory = new DirectoryInfo(Path.GetTempPath() + @"\tempOut\release");
@@ -82,17 +87,18 @@ namespace ReposUploader
                 {
                     file.Delete();
                 }
+
                 foreach (DirectoryInfo dir in tempDirectory.GetDirectories())
                 {
                     dir.Delete(true);
                 }
+
                 Console.WriteLine("...OK");
             }
-
         }
+
         public static void CreateUpdatePack()
         {
-
             PrepareDirectories();
             timer = Stopwatch.StartNew();
             newHashSet = new Dictionary<string, string>();
@@ -124,7 +130,7 @@ namespace ReposUploader
             pack.DateTime = dt;
 
             //version number in repos is in base of date of compilation because we have a lot of builds
-            pack.MainVer = new Version(dt.Year - 2016, dt.Month, dt.Day, (dt.Hour * 60 + dt.Minute)).ToString();
+            pack.MainVer = new Version(dt.Year - 2016, dt.Month, dt.Day, ((dt.Hour * 60) + dt.Minute)).ToString();
 
             pack.EntryPoint = GlobalParams["AppEntryPoint"];
             pack.ProgramFullName = GlobalParams["AppFullName"];
@@ -150,17 +156,18 @@ namespace ReposUploader
                     UploadToFTP(Path.GetTempPath() + @"\tempOut\local.json", "ftp://" + GlobalParams["ftpAddress"] + "/" + GlobalParams["ftpAppDir"] + "/local.json.deploy");
                 }
             }
-            Console.WriteLine("Ready, " + CounterFilesChecked + " checked, " + CounterFilesZiped + " zipped, " + CounterFilesUploaded + " uploaded");
 
+            Console.WriteLine("Ready, " + CounterFilesChecked + " checked, " + CounterFilesZiped + " zipped, " + CounterFilesUploaded + " uploaded");
 
             if (!AutoClose)
             {
                 Console.ReadKey();
             }
         }
+
         public static PackDir GetDir(DirectoryInfo _dir, string _directory = "")
         {
-            if (_directory != "")
+            if (_directory != string.Empty)
             {
                 _directory += "\\";
             }
@@ -202,11 +209,11 @@ namespace ReposUploader
             _thisPackDir.Size = DirectorySize;
 
             return _thisPackDir;
-
         }
+
         public static PackFile CheckFile(FileInfo f, string _directory = "")
         {
-            if (_directory != "")
+            if (_directory != string.Empty)
             {
                 _directory += "\\";
             }
@@ -219,7 +226,6 @@ namespace ReposUploader
                 Hash = Hash(f.OpenRead()),
                 Size = f.Length
             };
-
 
             newHashSet.Add(completePath, p1.Hash);
             var _noFileChanges = prevHashSet.ContainsKey(completePath)
@@ -238,6 +244,7 @@ namespace ReposUploader
                 {
                     archive.CreateEntryFromFile(completePath, f.Name, CompressionLevel.Optimal);
                 }
+
                 Console.Write(" zip");
                 var f2 = new FileInfo(completePath);
                 f2.Delete();
@@ -258,7 +265,6 @@ namespace ReposUploader
 
             return p1;
         }
-
 
         private static void UploadToFTP(string completePath, string _rutaArriba)
         {
@@ -306,34 +312,36 @@ namespace ReposUploader
 
             public FtpState()
             {
-                wait = new ManualResetEvent(false);
+                this.wait = new ManualResetEvent(false);
             }
 
             public ManualResetEvent OperationComplete
             {
-                get { return wait; }
+                get { return this.wait; }
             }
 
             public FtpWebRequest Request
             {
-                get { return request; }
-                set { request = value; }
+                get { return this.request; }
+                set { this.request = value; }
             }
 
             public string FileName
             {
-                get { return fileName; }
-                set { fileName = value; }
+                get { return this.fileName; }
+                set { this.fileName = value; }
             }
+
             public Exception OperationException
             {
-                get { return operationException; }
-                set { operationException = value; }
+                get { return this.operationException; }
+                set { this.operationException = value; }
             }
+
             public string StatusDescription
             {
-                get { return status; }
-                set { status = value; }
+                get { return this.status; }
+                set { this.status = value; }
             }
         }
 
@@ -368,6 +376,7 @@ namespace ReposUploader
                     state
                 );
             }
+
             // Return exceptions to the main application thread.
             catch (Exception e)
             {
@@ -377,8 +386,6 @@ namespace ReposUploader
                 return;
             }
         }
-
-
 
         private static void EndGetResponseCallback(IAsyncResult ar)
         {
@@ -393,6 +400,7 @@ namespace ReposUploader
                 // the operation is complete.
                 state.OperationComplete.Set();
             }
+
             // Return exceptions to the main application thread.
             catch (Exception e)
             {
@@ -402,12 +410,11 @@ namespace ReposUploader
             }
         }
 
-
         public static MD5 md5 = MD5.Create();
         public static string Hash(FileStream stream)
         {
             var hash = md5.ComputeHash(stream);
-            return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+            return BitConverter.ToString(hash).Replace("-", string.Empty).ToLowerInvariant();
         }
     }
 }

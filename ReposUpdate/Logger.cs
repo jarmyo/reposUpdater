@@ -25,6 +25,7 @@ namespace ReposUpdate
                 w.WriteLine(completeString);
             }
         }
+
         public static Stopwatch timer;
         private static bool Started = false;
     }

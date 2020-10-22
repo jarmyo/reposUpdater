@@ -13,12 +13,13 @@ namespace ReposUpdate
                 _directorio.Create();
             }
         }
+
         internal static MD5 md5 = MD5.Create();
 
         internal static string Hash(FileStream stream)
         {
             var hash = md5.ComputeHash(stream);
-            return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+            return BitConverter.ToString(hash).Replace("-", string.Empty).ToLowerInvariant();
         }
 
         internal static void CopyMeToInstallPath()
@@ -39,8 +40,10 @@ namespace ReposUpdate
                 {
                     return;
                 }
+
                 nuevo.Delete();
             }
+
             File.Copy(AppDomain.CurrentDomain.BaseDirectory + "\\" + AppDomain.CurrentDomain.FriendlyName, newpath);
         }
     }

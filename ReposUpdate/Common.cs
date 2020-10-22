@@ -29,10 +29,9 @@ namespace ReposUpdate
         //strings, change this to change to your language
         internal static Dictionary<string, string> Strings = new Dictionary<string, string>()
         {
-            {"FirstInstall","Primera Instalacion" },
-            {"Updating","Actualizando" },
-            {"UnInstallOk","Desinstalado Correctamente" },
+            { "FirstInstall", "Primera Instalacion" },
+            { "Updating", "Actualizando" },
+            { "UnInstallOk", "Desinstalado Correctamente" },
         };
-
     }
 }
