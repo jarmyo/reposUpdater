@@ -20,7 +20,7 @@ namespace ReposUpdate
             var completeString = timerText + logMessage;
 
             Debug.WriteLine(completeString);
-            using (StreamWriter w = File.AppendText(Common.Path_Logs + "Update.txt"))
+            using (StreamWriter w = File.AppendText(Common.PathLogs + "Update.txt"))
             {
                 w.WriteLine(completeString);
             }

@@ -34,9 +34,9 @@ namespace ReposUpdate
                 or.Dispose();
                 var oo = new FileInfo(AppDomain.CurrentDomain.BaseDirectory + "\\" + AppDomain.CurrentDomain.FriendlyName);
                 var or2 = oo.OpenRead();
-                var _nuevo = Hash(or2);
+                var nuevo1 = Hash(or2);
                 or2.Dispose();
-                if (_actual == _nuevo)
+                if (_actual == nuevo1)
                 {
                     return;
                 }

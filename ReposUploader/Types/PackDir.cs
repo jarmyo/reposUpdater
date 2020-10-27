@@ -6,8 +6,8 @@ namespace ReposUploader
     {
         public PackDir()
         {
-            this.PackFiles = new List<PackFile>();
-            this.PackDirs = new List<PackDir>();
+            this.PackFiles=new List<PackFile>();
+            this.PackDirs=new List<PackDir>();
         }
 
         public string Name { get; set; }
