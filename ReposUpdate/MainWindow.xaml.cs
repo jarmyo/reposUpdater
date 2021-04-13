@@ -50,7 +50,7 @@ namespace ReposUpdate
             foreach (var dirRemoto in remote.PackDirs)
             {
                 var dirLocales = local.PackDirs.Where(d => d.Name == dirRemoto.Name);
-                PackDir dirLocal = dirLocales.Any() ? dirLocal = dirLocales.First() : null;
+                PackDir dirLocal = dirLocales.Any() ? dirLocales.First() : null;
                 this.CheckDirs(dirRemoto, dirLocal, dirRemoto.Name);
             }
         }

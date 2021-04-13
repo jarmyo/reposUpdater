@@ -14,11 +14,11 @@ namespace ReposUpdate
             }
         }
 
-        internal static MD5 md5 = MD5.Create();
+        internal static readonly SHA256 sha256 = SHA256.Create();
 
         internal static string Hash(FileStream stream)
         {
-            var hash = md5.ComputeHash(stream);
+            var hash = sha256.ComputeHash(stream);
             return BitConverter.ToString(hash).Replace("-", string.Empty).ToLowerInvariant();
         }
 
