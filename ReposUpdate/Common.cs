@@ -19,13 +19,13 @@ namespace ReposUpdate
         internal static readonly string PathLogs = InstalationPath + @"logs\";
 
         // Deployment changes compare
-        internal static IDeployPack local;
-        internal static IDeployPack remote;
+        internal static IDeployPack local { get; set; }
+        internal static IDeployPack remote { get; set; }
 
         // Helpers
-        internal static bool DownloadAllFiles;
-        internal static double Increment;
-        internal static double BytesDownloaded;
+        internal static bool DownloadAllFiles { get; set; }
+        internal static double Increment { get; set; }
+        internal static double BytesDownloaded { get; set; }
 
         // strings, change this to change to your language
         internal static readonly Dictionary<string, string> Strings = new Dictionary<string, string>

@@ -11,7 +11,7 @@ using System.Web.Script.Serialization;
 
 namespace ReposUploader
 {
-    internal partial class Program
+    internal static class Program
     {
         private static Stopwatch timer;
         private static bool AutoClose = true;
