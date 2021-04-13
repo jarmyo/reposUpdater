@@ -105,10 +105,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Types\DeployPack.cs" />
-    <Compile Include="Types\PackDir.cs" />
-    <Compile Include="Types\PackFile.cs" />
-    <Compile Include="Types\PublisherInfo.cs" />
     <Compile Include="Utils.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -179,6 +175,12 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\CommonTypes\CommonTypes.csproj">
+      <Project>{fe12a8bf-b5fb-429c-ad34-90e958bb9243}</Project>
+      <Name>CommonTypes</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
