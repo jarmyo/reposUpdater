@@ -10,17 +10,23 @@ using static ReposUpdate.Common;
 
 namespace ReposUpdate
 {
+
+    public static class MainApp
+    {
+        [STAThread]
+        public static void Main(string[] args)
+        {            
+            var a = new App();
+            a.Run();
+        }
+
+    }
+
     /// <summary>
     /// Updater.
     /// </summary>
     public class App : Application
     {
-        private static void Main(string[] args)
-        {
-            Current.MainWindow = new MainWindow();
-            Current.MainWindow.Show();
-        }
-
         protected override void OnStartup(StartupEventArgs e)
         {
             if (e.Args.Length > 0)
@@ -36,13 +42,12 @@ namespace ReposUpdate
             }
             else
             {
-                this.InitEnvironment();
-
-                if (this.FindNewVersion())
+                InitEnvironment();
+                if (FindNewVersion())
                 {
                     Logger.Write("new version Found");
                     Current.MainWindow = new MainWindow();
-                    Current.MainWindow.Show();
+                    Current.MainWindow.Show();                    
                 }
                 else
                 {
@@ -116,14 +121,14 @@ namespace ReposUpdate
                     Logger.Write("first instalation detected");
                     client.DownloadFile(remoteString, PathUpdate + updateFileName + "_temp.json");
                     DownloadAllFiles = true;
-                    local = JsonConvert.Deserialize<IDeployPack>(File.ReadAllText(PathUpdate + updateFileName + "_temp.json"));
+                    local = JsonConvert.Deserialize<DeployPack>(File.ReadAllText(PathUpdate + updateFileName + "_temp.json"));
                 }
                 else
                 {
-                    local = JsonConvert.Deserialize<IDeployPack>(File.ReadAllText(PathUpdate + updateFileName + ".json"));
+                    local = JsonConvert.Deserialize<DeployPack>(File.ReadAllText(PathUpdate + updateFileName + ".json"));
                 }
 
-                remote = JsonConvert.Deserialize<IDeployPack>(client.DownloadString(remoteString));
+                remote = JsonConvert.Deserialize<DeployPack>(client.DownloadString(remoteString));
                 return remote.DateTime > local.DateTime || DownloadAllFiles;
             }
             catch (Exception eer)

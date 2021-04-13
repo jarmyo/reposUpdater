@@ -37,8 +37,8 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>false</DebugSymbols>
-    <DebugType>none</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
@@ -57,7 +57,7 @@
     <CodeAnalysisRuleSet>..\..\ReposPOS\ReposPOS.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>ReposUpdate.App</StartupObject>
+    <StartupObject>ReposUpdate.MainApp</StartupObject>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>repos.ico</ApplicationIcon>
@@ -107,6 +107,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MainWindowCheck.cs" />
+    <Compile Include="Types\DeployPack.cs" />
+    <Compile Include="Types\PackDir.cs" />
+    <Compile Include="Types\PackFile.cs" />
+    <Compile Include="Types\PublisherInfo.cs" />
     <Compile Include="Utils.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -145,9 +149,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="repos.ico" />
   </ItemGroup>
   <ItemGroup>
@@ -172,13 +173,6 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\CommonTypes\CommonTypes.csproj">
-      <Project>{fe12a8bf-b5fb-429c-ad34-90e958bb9243}</Project>
-      <Name>CommonTypes</Name>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

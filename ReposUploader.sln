@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReposUploader", "ReposUploa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReposUpdate", "ReposUpdate\ReposUpdate.csproj", "{C3CBD793-03AC-40CC-9715-5C2AC492AC9A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonTypes", "CommonTypes\CommonTypes.csproj", "{FE12A8BF-B5FB-429C-AD34-90E958BB9243}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,10 +21,6 @@ Global
 		{C3CBD793-03AC-40CC-9715-5C2AC492AC9A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C3CBD793-03AC-40CC-9715-5C2AC492AC9A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C3CBD793-03AC-40CC-9715-5C2AC492AC9A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FE12A8BF-B5FB-429C-AD34-90E958BB9243}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FE12A8BF-B5FB-429C-AD34-90E958BB9243}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FE12A8BF-B5FB-429C-AD34-90E958BB9243}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FE12A8BF-B5FB-429C-AD34-90E958BB9243}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

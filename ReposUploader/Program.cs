@@ -165,7 +165,7 @@ namespace ReposUploader
             }
         }
 
-        public static IPackDir GetDir(DirectoryInfo _dir, string _directory = "")
+        public static PackDir GetDir(DirectoryInfo _dir, string _directory = "")
         {
             if (_directory != string.Empty)
             {
@@ -211,7 +211,7 @@ namespace ReposUploader
             return _thisPackDir;
         }
 
-        public static IPackFile CheckFile(FileInfo f, string _directory = "")
+        public static PackFile CheckFile(FileInfo f, string _directory = "")
         {
             if (_directory != string.Empty)
             {

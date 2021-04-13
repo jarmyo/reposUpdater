@@ -22,7 +22,7 @@ namespace ReposUpdate
             }
         }
 
-        private void CheckDirs(IPackDir dirRemoto1, IPackDir dirlocal, string dirname = "")
+        private void CheckDirs(PackDir dirRemoto1, PackDir dirlocal, string dirname = "")
         {
             if (dirname != string.Empty)
             {
@@ -57,7 +57,7 @@ namespace ReposUpdate
             }
         }
 
-        private void CheckFiles(IList<IPackFile> archivosRemotos, IList<IPackFile> archivosLocales, string dirname = "")
+        private void CheckFiles(List<PackFile> archivosRemotos, List<PackFile> archivosLocales, string dirname = "")
         {
             if (archivosLocales == null)
             {
