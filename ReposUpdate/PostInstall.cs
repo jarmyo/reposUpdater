@@ -36,7 +36,7 @@ namespace ReposUpdate
                         }
 
                         key.SetValue("DisplayName", Common.remote.ProgramFullName);
-                        key.SetValue("ApplicationVersion", nuevaVersion.ToString());
+                        key.SetValue("ApplicationVersion", nuevaVersion);
                         key.SetValue("Publisher", Common.remote.Publisher.Name);
                         key.SetValue("DisplayIcon", Common.InstalationPath + AppDomain.CurrentDomain.FriendlyName);
                         key.SetValue("DisplayVersion", nuevaVersion);
