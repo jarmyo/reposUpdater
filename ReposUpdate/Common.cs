@@ -19,8 +19,8 @@ namespace ReposUpdate
         internal static readonly string PathLogs = InstalationPath + @"logs\";
 
         // Deployment changes compare
-        internal static DeployPack local;
-        internal static DeployPack remote;
+        internal static IDeployPack local;
+        internal static IDeployPack remote;
 
         // Helpers
         internal static bool DownloadAllFiles = false;

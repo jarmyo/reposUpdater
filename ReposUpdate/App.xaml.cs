@@ -74,7 +74,7 @@ namespace ReposUpdate
                 }
 
                 MessageBox.Show(Strings["UnInstallOk"]); //Uninstalled successfully
-                Process.Start(new ProcessStartInfo()
+                Process.Start(new ProcessStartInfo
                 {
                     Arguments = "/C choice /C Y /N /D Y /T 3 & Del \"" + Common.InstalationPath + AppDomain.CurrentDomain.FriendlyName + "\"",
                     WindowStyle = ProcessWindowStyle.Hidden,
@@ -110,14 +110,14 @@ namespace ReposUpdate
                     Logger.Write("first instalation detected");
                     client.DownloadFile(remoteString, PathUpdate + updateFileName + "_temp.json");
                     DownloadAllFiles = true;
-                    local = JsonConvert.Deserialize<DeployPack>(File.ReadAllText(PathUpdate + updateFileName + "_temp.json"));
+                    local = JsonConvert.Deserialize<IDeployPack>(File.ReadAllText(PathUpdate + updateFileName + "_temp.json"));
                 }
                 else
                 {
-                    local = JsonConvert.Deserialize<DeployPack>(File.ReadAllText(PathUpdate + updateFileName + ".json"));
+                    local = JsonConvert.Deserialize<IDeployPack>(File.ReadAllText(PathUpdate + updateFileName + ".json"));
                 }
 
-                remote = JsonConvert.Deserialize<DeployPack>(client.DownloadString(remoteString));
+                remote = JsonConvert.Deserialize<IDeployPack>(client.DownloadString(remoteString));
                 return remote.DateTime > local.DateTime || DownloadAllFiles;
             }
             catch (Exception eer)

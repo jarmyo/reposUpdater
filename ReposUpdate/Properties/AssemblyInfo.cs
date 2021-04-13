@@ -14,10 +14,6 @@ using System.Windows;
 [assembly: AssemblyCopyright("Copyright © repos software 2020")]
 [assembly: AssemblyTrademark("repos.mx")]
 [assembly: AssemblyCulture("")]
-
-// Setting ComVisible to false makes the types in this assembly not visible
-// to COM components.  If you need to access a type in this assembly from
-// COM, set the ComVisible attribute to true on that type.
 [assembly: ComVisible(false)]
 
 //In order to begin building localizable applications, set

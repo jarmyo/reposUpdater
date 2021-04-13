@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReposUploader", "ReposUploa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReposUpdate", "ReposUpdate\ReposUpdate.csproj", "{C3CBD793-03AC-40CC-9715-5C2AC492AC9A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonTypes", "..\CommonTypes\CommonTypes.csproj", "{FE12A8BF-B5FB-429C-AD34-90E958BB9243}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonTypes", "CommonTypes\CommonTypes.csproj", "{FE12A8BF-B5FB-429C-AD34-90E958BB9243}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -109,9 +109,10 @@ namespace ReposUploader
                 prevHashSet=new Dictionary<string, string>();
             }
 
+
             var _binaryDirectory = new DirectoryInfo(GlobalParams["binPath"]);
 
-            var pack = new DeployPack();
+            DeployPack pack = new DeployPack();
             CounterFilesChecked=0;
             CounterFilesZiped=0;
             CounterFilesUploaded=0;
@@ -163,7 +164,7 @@ namespace ReposUploader
             }
         }
 
-        public static PackDir GetDir(DirectoryInfo _dir, string _directory = "")
+        public static IPackDir GetDir(DirectoryInfo _dir, string _directory = "")
         {
             if (_directory!=string.Empty)
             {
@@ -209,7 +210,7 @@ namespace ReposUploader
             return _thisPackDir;
         }
 
-        public static PackFile CheckFile(FileInfo f, string _directory = "")
+        public static IPackFile CheckFile(FileInfo f, string _directory = "")
         {
             if (_directory!=string.Empty)
             {
@@ -218,7 +219,7 @@ namespace ReposUploader
 
             var completePath = Path.GetTempPath()+@"\tempOut\release\"+_directory+f.Name;
 
-            var p1 = new PackFile
+            var p1 = new PackFile()
             {
                 Name=f.Name,
                 Hash=Hash(f.OpenRead()),

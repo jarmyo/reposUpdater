@@ -50,8 +50,8 @@ namespace ReposUpdate
 
             foreach (var dirRemoto in remote.PackDirs)
             {
-                var dirLocales = local.PackDirs.Where(d => d.Name == dirRemoto.Name);
-                PackDir dirLocal = dirLocales.Any() ? dirLocales.First() : null;
+                var dirLocales = local.PackDirs.Where(d => d.Name == dirRemoto.Name);                
+                IPackDir dirLocal = dirLocales.Any() ? dirLocales.First() : null;
                 this.CheckDirs(dirRemoto, dirLocal, dirRemoto.Name);
             }
         }
@@ -92,9 +92,9 @@ namespace ReposUpdate
             }
         }
 
-        private void CheckDirs(PackDir dirRemoto1, PackDir dirlocal, string dirname = "")
+        private void CheckDirs(IPackDir dirRemoto1, IPackDir dirlocal, string dirname = "")
         {
-            if (dirname != string.Empty)
+             if (dirname != string.Empty)
             {
                 dirname += @"\";
             }
@@ -127,7 +127,7 @@ namespace ReposUpdate
             }
         }
 
-        private void CheckFiles(List<PackFile> archivosRemotos, List<PackFile> archivosLocales, string dirname = "")
+        private void CheckFiles(IList<IPackFile> archivosRemotos, IList<IPackFile> archivosLocales, string dirname = "")
         {
             if (archivosLocales == null)
             {

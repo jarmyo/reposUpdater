@@ -5,7 +5,7 @@ using System.IO;
 
 namespace ReposUpdate
 {
-    public class Logger
+    public static class Logger
     {
         public static void Write(string logMessage)
         {

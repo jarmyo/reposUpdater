@@ -60,9 +60,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DeployPack.cs" />
     <Compile Include="FtpState.cs" />
+    <Compile Include="PackDir.cs" />
+    <Compile Include="PackFile.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PublisherInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -72,7 +76,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\CommonTypes\CommonTypes.csproj">
+    <ProjectReference Include="..\CommonTypes\CommonTypes.csproj">
       <Project>{fe12a8bf-b5fb-429c-ad34-90e958bb9243}</Project>
       <Name>CommonTypes</Name>
     </ProjectReference>
