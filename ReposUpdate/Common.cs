@@ -10,7 +10,7 @@ namespace ReposUpdate
         internal const string remoteStringPath = "https://repos.mx/App/";
         internal const string InstalationPath = @"C:\Repos\";
         internal const string EntryPoint = @"repos.exe";
-        internal static Guid ApplicationGUID = new Guid("45A40446169340338D74048D9297426C");
+        internal static readonly Guid ApplicationGUID = new Guid("45A40446169340338D74048D9297426C");
 
         // App default directories
         internal static readonly string PathUpdate = InstalationPath + @"update\";

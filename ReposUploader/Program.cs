@@ -11,12 +11,12 @@ using System.Web.Script.Serialization;
 
 namespace ReposUploader
 {
-    internal class Program
+    internal partial class Program
     {
         private static Stopwatch timer;
         private static bool AutoClose = true;
-        private static bool ForceUploadAll = false;
-        private static bool NoUpload = false;
+        private static bool ForceUploadAll;
+        private static bool NoUpload;
         private static readonly JavaScriptSerializer JsonConvert = new JavaScriptSerializer();
 
         private static Dictionary<string, string> GlobalParams;
@@ -298,49 +298,6 @@ namespace ReposUploader
             CounterFilesUploaded++;
         }
 
-        public class FtpState
-        {
-            private ManualResetEvent wait;
-            private FtpWebRequest request;
-            private string fileName;
-            private Exception operationException;
-            string status;
-
-            public FtpState()
-            {
-                this.wait=new ManualResetEvent(false);
-            }
-
-            public ManualResetEvent OperationComplete
-            {
-                get { return this.wait; }
-            }
-
-            public FtpWebRequest Request
-            {
-                get { return this.request; }
-                set { this.request=value; }
-            }
-
-            public string FileName
-            {
-                get { return this.fileName; }
-                set { this.fileName=value; }
-            }
-
-            public Exception OperationException
-            {
-                get { return this.operationException; }
-                set { this.operationException=value; }
-            }
-
-            public string StatusDescription
-            {
-                get { return this.status; }
-                set { this.status=value; }
-            }
-        }
-
         private static void EndGetStreamCallback(IAsyncResult ar)
         {
             FtpState state = (FtpState)ar.AsyncState;
@@ -405,10 +362,10 @@ namespace ReposUploader
             }
         }
 
-        public static MD5 md5 = MD5.Create();
+        public static SHA256 sha256 = SHA256.Create();
         public static string Hash(FileStream stream)
         {
-            var hash = md5.ComputeHash(stream);
+            var hash = sha256.ComputeHash(stream);
             return BitConverter.ToString(hash).Replace("-", string.Empty).ToLowerInvariant();
         }
     }

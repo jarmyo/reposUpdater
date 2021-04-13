@@ -1,18 +1,23 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 
 namespace ReposUpdate
 {
     public class Logger
     {
-        public static void Write(string logMessage, bool showTimer = true)
+        public static void Write(string logMessage)
+        {
+            Write(logMessage, true);
+        }
+        public static void Write(string logMessage, bool showTimer)
         {
             if (!Started)
             {
                 timer = Stopwatch.StartNew();
                 Started = true;
-                Write(DateTime.Now.ToString(CultureInfo.Invariantculture));
+                Write(DateTime.Now.ToString(CultureInfo.InvariantCulture));
                 Write("========================================");
             }
 

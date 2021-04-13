@@ -60,6 +60,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FtpState.cs" />
     <Compile Include="Types\DeployPack.cs" />
     <Compile Include="Types\PackDir.cs" />
     <Compile Include="Types\PackFile.cs" />

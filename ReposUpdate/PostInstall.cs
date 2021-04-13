@@ -72,8 +72,7 @@ namespace ReposUpdate
         }
 
         public static void AddCertificate()
-        {
-            Console.Write("Instalando certificados de seguridad");
+        {            
             X509Certificate2 certificate = new X509Certificate2(Common.InstalationPath + @"data\repos.cer");
             X509Store store = new X509Store(StoreName.AuthRoot, StoreLocation.LocalMachine);
             store.Open(OpenFlags.ReadWrite);
@@ -83,8 +82,7 @@ namespace ReposUpdate
             store = new X509Store(StoreName.AuthRoot, StoreLocation.CurrentUser);
             store.Open(OpenFlags.ReadWrite);
             store.Add(certificate);
-            store.Close();
-            Console.WriteLine("...OK");
+            store.Close();         
         }
 
         public static void CreateDesktopShorcut()
