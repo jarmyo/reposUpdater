@@ -1,21 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
+
 namespace ReposUploader
 {
-    public class DeployPack
+    [ComImport]
+    [Guid("733161E9-8F92-4E58-AE5A-2BCE0DA77DB8")]
+    [TypeLibType(TypeLibTypeFlags.FLicensed)]
+    public class DeployPack : IDeployPack
     {
-        public DeployPack()
-        {
-            PackFiles = new List<PackFile>();
-            PackDirs = new List<PackDir>();
-        }
-        public string MainVer { get; set; }
-        public DateTime DateTime { get; set; }
-        public long Size { get; set; }
-        public List<PackFile> PackFiles { get; set; }
-        public List<PackDir> PackDirs { get; set; }
-        public PublisherInfo Publisher { get; set; }
-        public string ProgramFullName { get; set; }
-        public string EntryPoint { get; set; }
+        public extern string MainVer { get; set; }
+        public extern DateTime DateTime { get; set; }
+        public extern long Size { get; set; }
+        public extern IList<IPackFile> PackFiles { get; set; }
+        public extern IList<IPackDir> PackDirs { get; set; }
+        public extern IPublisherInfo Publisher { get; set; }
+        public extern string ProgramFullName { get; set; }
+        public extern string EntryPoint { get; set; }
     }
 }

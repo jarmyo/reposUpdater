@@ -32,6 +32,6 @@ namespace ReposUpdate
         }
 
         public static Stopwatch timer;
-        private static bool Started = false;
+        private static bool Started;
     }
 }

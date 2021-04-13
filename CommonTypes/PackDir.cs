@@ -4,13 +4,13 @@ using System.Runtime.InteropServices;
 namespace ReposUploader
 {
     [ComImport]
-    [Guid("175EB158-B655-11E1-B477-02566188709B")]
-    [TypeLibType(TypeLibTypeFlags.FLicensed)]    
-    public interface IPackDir
+    [Guid("A7C096AB-A529-4BBD-A608-578A7FFA4F88")]
+    [TypeLibType(TypeLibTypeFlags.FLicensed)]
+    public class PackDir : IPackDir
     {
-        string Name { get; set; }
-        long Size { get; set; }
-        IList<IPackFile> PackFiles { get; set; }
-        IList<IPackDir> PackDirs { get; set; }
+        public extern string Name { get; set; }
+        public extern long Size { get; set; }
+        public extern IList<IPackFile> PackFiles { get; set; }
+        public extern IList<IPackDir> PackDirs { get; set; }
     }
 }

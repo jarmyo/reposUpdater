@@ -233,8 +233,7 @@ namespace ReposUploader
             CounterFilesChecked++;
 
             if (ForceUploadAll||!_noFileChanges)
-            {
-                // Console.WriteLine();
+            {                
                 Console.Write(timer.Elapsed.ToString()+" "+f.Name+" - "+f.Length+"b .");
 
                 f.CopyTo(completePath);
@@ -336,8 +335,7 @@ namespace ReposUploader
             {
                 Console.WriteLine("Could not get the request stream.");
                 state.OperationException=e;
-                state.OperationComplete.Set();
-                return;
+                state.OperationComplete.Set();                
             }
         }
 

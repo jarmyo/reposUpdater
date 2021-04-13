@@ -3,14 +3,14 @@
 namespace ReposUploader
 {
     [ComImport]
-    [Guid("8F619BEE-824E-474F-84AD-A9A3A19A76BA")]
-    [TypeLibType(TypeLibTypeFlags.FLicensed)]    
-    public interface IPublisherInfo
+    [Guid("CF138F4A-5B6F-487F-920B-B8C139E5F451")]
+    [TypeLibType(TypeLibTypeFlags.FLicensed)]
+    public class PublisherInfo : IPublisherInfo
     {
-        string Name { get; set; }
-        string SupportLink { get; set; }
-        string SupportPhone { get; set; }
-        string SupportMail { get; set; }
-        string WebLink { get; set; }
+        public extern string Name { get; set; }
+        public extern string SupportLink { get; set; }
+        public extern string SupportMail { get; set; }
+        public extern string SupportPhone { get; set; }
+        public extern string WebLink { get; set; }
     }
 }

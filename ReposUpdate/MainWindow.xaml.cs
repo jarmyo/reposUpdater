@@ -168,7 +168,7 @@ namespace ReposUpdate
             }
         }
 
-        private async void DownloadAndExtract(string nomDirectorio, string nomArchivo, long size)
+        private async Task DownloadAndExtract(string nomDirectorio, string nomArchivo, long size)
         {
             var archivoArriba = Common.remoteStringPath + "release/" + nomDirectorio + nomArchivo + ".zip";
 

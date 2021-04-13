@@ -39,10 +39,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DeployPack.cs" />
     <Compile Include="IDeployPack.cs" />
+    <Compile Include="IPackFile.cs" />
+    <Compile Include="IPackDir.cs" />
     <Compile Include="PackDir.cs" />
     <Compile Include="PackFile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="IPublisherInfo.cs" />
     <Compile Include="PublisherInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

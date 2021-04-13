@@ -8,7 +8,7 @@ namespace ReposUploader
     {
         public class FtpState : IDisposable
         {
-            private ManualResetEvent wait;
+            private readonly ManualResetEvent wait;
             private FtpWebRequest request;
             private string fileName;
             private Exception operationException;
@@ -49,7 +49,8 @@ namespace ReposUploader
             }
 
             public void Dispose()
-            {                
+            {   
+                //Nada que hacer
             }
         }
     }

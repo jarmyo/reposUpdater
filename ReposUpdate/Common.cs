@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace ReposUpdate
 {
-    internal static partial class Common
+    internal static class Common
     {
         // Replace this with your info
         internal const string updateFileName = "local";
@@ -23,12 +23,12 @@ namespace ReposUpdate
         internal static IDeployPack remote;
 
         // Helpers
-        internal static bool DownloadAllFiles = false;
-        internal static double Increment = 0;
-        internal static double BytesDownloaded = 0;
+        internal static bool DownloadAllFiles;
+        internal static double Increment;
+        internal static double BytesDownloaded;
 
         // strings, change this to change to your language
-        internal static Dictionary<string, string> Strings = new Dictionary<string, string>()
+        internal static readonly Dictionary<string, string> Strings = new Dictionary<string, string>
         {
             { "FirstInstall", "Primera Instalacion" },
             { "Updating", "Actualizando" },
