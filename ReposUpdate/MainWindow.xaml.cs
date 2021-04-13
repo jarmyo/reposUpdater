@@ -11,7 +11,7 @@ using static ReposUpdate.Common;
 
 namespace ReposUpdate
 {
-    public partial class MainWindow : Window
+    public partial class MainWindow
     {
         private static readonly List<string> DownloadedFiles = new List<string>();
         public MainWindow()

@@ -8,7 +8,7 @@ using static ReposUpdate.Common;
 
 namespace ReposUpdate
 {
-    public partial class MainWindow : Window
+    public partial class MainWindow
     {
         private void CheckDefinitionFile()
         {

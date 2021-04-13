@@ -341,7 +341,7 @@ namespace ReposUploader
             }
         }
 
-        public static SHA256 sha256 = SHA256.Create();
+        public static readonly SHA256 sha256 = SHA256.Create();
         public static string Hash(FileStream stream)
         {
             var hash = sha256.ComputeHash(stream);

@@ -15,6 +15,12 @@ namespace ReposUpdate
     /// </summary>
     public class App : Application
     {
+        private static void Main(string[] args)
+        {
+            Current.MainWindow = new MainWindow();
+            Current.MainWindow.Show();
+        }
+
         protected override void OnStartup(StartupEventArgs e)
         {
             if (e.Args.Length > 0)
