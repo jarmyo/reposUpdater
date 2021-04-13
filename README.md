@@ -1,4 +1,8 @@
 # reposUpdater
+
+[![CodeFactor](https://www.codefactor.io/repository/github/jarmyo/reposupdater/badge)](https://www.codefactor.io/repository/github/jarmyo/reposupdater)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/35dd563abff24108a4c3912895ef6265)](https://www.codacy.com/gh/jarmyo/reposUpdater/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=jarmyo/reposUpdater&amp;utm_campaign=Badge_Grade)
+
 There are simple deployment tools for autoupdate applications. A lightweight alternative to clickOnce that allows run as administrator.
 It conssist in two tools, ReposUploader and ReposUpdate:
 
