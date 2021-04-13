@@ -12,7 +12,7 @@ namespace ReposUpdate
     /// <summary>
     /// Updater.
     /// </summary>
-    public partial class App : Application
+    public class App : Application
     {
         protected override void OnStartup(StartupEventArgs e)
         {

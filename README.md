@@ -5,7 +5,7 @@ It conssist in two tools, ReposUploader and ReposUpdate:
 ## ReposUploader
 Tool to zip each file in bin/release folder of project, creates a json file that contains info of the package (filename, hash, version) and then upload these files to ftp server. 
 
-### Usage
+### Config
 Change contents of [ExampleConfig.json file](https://github.com/jarmyo/reposUpdater/blob/main/ReposUploader/ExampleConfig.json) and rename to config.json. this file must have been in the same path as the executable, in this file put ftp server address, app folder, user, password, publisher info, etc.
 
 The first run needs create a file named 'globalhash.json' that contains CRC hash of files already in the server. This is because the tool dont upload all the files each time, just the files with changes.
@@ -16,7 +16,6 @@ This tool check for changes in a json file on the ftp server, download request f
 
 ### Usage
 Only replace all params on [Common class](https://github.com/jarmyo/reposUpdater/blob/main/ReposUpdate/Common.cs) : compile and distribute. You can change the icon, the description, etc.
-
 
 ## Contributing
 This is my first project in github, be gentile :)

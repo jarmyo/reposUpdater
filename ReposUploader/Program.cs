@@ -101,10 +101,9 @@ namespace ReposUploader
             timer=Stopwatch.StartNew();
             newHashSet=new Dictionary<string, string>();
 
-            if (!ForceUploadAll)
-            {
-                //TODO: check if file exist
-                prevHashSet=JsonConvert.Deserialize<Dictionary<string, string>>(File.ReadAllText(GlobalParams["GlobalHashLocation"]));
+            if (!ForceUploadAll && File.Exists(GlobalParams["GlobalHashLocation"]))
+            {                
+                prevHashSet=JsonConvert.Deserialize<Dictionary<string, string>>(File.ReadAllText(GlobalParams["GlobalHashLocation"]));             
             } else
             {
                 prevHashSet=new Dictionary<string, string>();
@@ -132,12 +131,14 @@ namespace ReposUploader
             pack.EntryPoint=GlobalParams["AppEntryPoint"];
             pack.ProgramFullName=GlobalParams["AppFullName"];
 
-            var pub = new PublisherInfo();
-            pub.Name=GlobalParams["PublisherName"];
-            pub.SupportLink=GlobalParams["PublisherSupport"];
-            pub.SupportMail=GlobalParams["PublisherSupportMail"];
-            pub.SupportPhone=GlobalParams["PublisherSupportPhone"];
-            pub.WebLink=GlobalParams["PublisherWeb"];
+            var pub = new PublisherInfo
+            {
+                Name = GlobalParams["PublisherName"],
+                SupportLink = GlobalParams["PublisherSupport"],
+                SupportMail = GlobalParams["PublisherSupportMail"],
+                SupportPhone = GlobalParams["PublisherSupportPhone"],
+                WebLink = GlobalParams["PublisherWeb"]
+            };
             pack.Publisher=pub;
 
             var result = JsonConvert.Serialize(pack);
@@ -217,7 +218,7 @@ namespace ReposUploader
 
             var completePath = Path.GetTempPath()+@"\tempOut\release\"+_directory+f.Name;
 
-            var p1 = new PackFile()
+            var p1 = new PackFile
             {
                 Name=f.Name,
                 Hash=Hash(f.OpenRead()),
@@ -302,7 +303,7 @@ namespace ReposUploader
             private ManualResetEvent wait;
             private FtpWebRequest request;
             private string fileName;
-            private Exception operationException = null;
+            private Exception operationException;
             string status;
 
             public FtpState()
@@ -385,10 +386,9 @@ namespace ReposUploader
         private static void EndGetResponseCallback(IAsyncResult ar)
         {
             FtpState state = (FtpState)ar.AsyncState;
-            FtpWebResponse response = null;
             try
             {
-                response=(FtpWebResponse)state.Request.EndGetResponse(ar);
+                var response = (FtpWebResponse)state.Request.EndGetResponse(ar);
                 response.Close();
                 state.StatusDescription=response.StatusDescription;
                 // Signal the main application thread that

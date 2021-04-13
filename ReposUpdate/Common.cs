@@ -13,9 +13,9 @@ namespace ReposUpdate
         internal static Guid ApplicationGUID = new Guid("45A40446169340338D74048D9297426C");
 
         // App default directories
-        internal static string PathUpdate = InstalationPath + @"update\";
-        internal static string PathApp = InstalationPath + @"app\";
-        internal static string PathLogs = InstalationPath + @"logs\";
+        internal static readonly string PathUpdate = InstalationPath + @"update\";
+        internal static readonly string PathApp = InstalationPath + @"app\";
+        internal static readonly string PathLogs = InstalationPath + @"logs\";
 
         // Deployment changes compare
         internal static DeployPack local;

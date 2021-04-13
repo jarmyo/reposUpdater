@@ -12,7 +12,7 @@ namespace ReposUpdate
             {
                 timer = Stopwatch.StartNew();
                 Started = true;
-                Write(DateTime.Now.ToString());
+                Write(DateTime.Now.ToString(CultureInfo.Invariantculture));
                 Write("========================================");
             }
 

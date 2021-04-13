@@ -17,7 +17,7 @@ namespace ReposUpdate
             {
                 if (parent == null)
                 {
-                    throw new Exception("Uninstall registry key not found.");
+                    throw new ApplicationException("Uninstall registry key not found.");
                 }
 
                 try
@@ -32,7 +32,7 @@ namespace ReposUpdate
 
                         if (key == null)
                         {
-                            throw new Exception(string.Format("Unable to create uninstaller '{0}\\{1}'", "UNINSTALL", guidText));
+                            throw new ApplicationException(string.Format("Unable to create uninstaller '{0}\\{1}'", "UNINSTALL", guidText));
                         }
 
                         key.SetValue("DisplayName", Common.remote.ProgramFullName);
@@ -58,7 +58,7 @@ namespace ReposUpdate
                 }
                 catch (Exception ex)
                 {
-                    throw new Exception(
+                    throw new ApplicationException(
                         "An error occurred writing uninstall information to the registry.  The service is fully installed but can only be uninstalled manually through the command line.",
                         ex);
                 }
