@@ -110,7 +110,6 @@ namespace ReposUploader
                 prevHashSet = new Dictionary<string, string>();
             }
 
-
             var _binaryDirectory = new DirectoryInfo(GlobalParams["binPath"]);
 
             DeployPack pack = new DeployPack();
