@@ -3,52 +3,51 @@ using System.Net;
 using System.Threading;
 
 namespace ReposUploader
-{
-    public class FtpState : IDisposable
-    {
-        private readonly ManualResetEvent wait;
-        private FtpWebRequest request;
-        private string fileName;
-        private Exception operationException;
-        string status;
-
-        public FtpState()
+{   
+        public class FtpState : IDisposable
         {
-            this.wait = new ManualResetEvent(false);
-        }
+            private ManualResetEvent wait;
+            private FtpWebRequest request;
+            private string fileName;
+            private Exception operationException;
+            string status;
 
-        public ManualResetEvent OperationComplete
-        {
-            get { return this.wait; }
-        }
+            public FtpState()
+            {
+                this.wait=new ManualResetEvent(false);
+            }
 
-        public FtpWebRequest Request
-        {
-            get { return this.request; }
-            set { this.request = value; }
-        }
+            public ManualResetEvent OperationComplete
+            {
+                get { return this.wait; }
+            }
 
-        public string FileName
-        {
-            get { return this.fileName; }
-            set { this.fileName = value; }
-        }
+            public FtpWebRequest Request
+            {
+                get { return this.request; }
+                set { this.request=value; }
+            }
 
-        public Exception OperationException
-        {
-            get { return this.operationException; }
-            set { this.operationException = value; }
-        }
+            public string FileName
+            {
+                get { return this.fileName; }
+                set { this.fileName=value; }
+            }
 
-        public string StatusDescription
-        {
-            get { return this.status; }
-            set { this.status = value; }
-        }
+            public Exception OperationException
+            {
+                get { return this.operationException; }
+                set { this.operationException=value; }
+            }
 
-        public void Dispose()
-        {
-            //Nada que hacer
+            public string StatusDescription
+            {
+                get { return this.status; }
+                set { this.status=value; }
+            }
+
+            public void Dispose()
+            {                
+            }
         }
     }
-}

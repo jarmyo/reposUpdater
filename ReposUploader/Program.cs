@@ -6,8 +6,8 @@ using System.IO.Compression;
 using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
+using System.Text.Json;
 using System.Threading;
-using System.Web.Script.Serialization;
 
 namespace ReposUploader
 {
@@ -17,7 +17,6 @@ namespace ReposUploader
         private static bool AutoClose = true;
         private static bool ForceUploadAll;
         private static bool NoUpload;
-        private static readonly JavaScriptSerializer JsonConvert = new JavaScriptSerializer();
 
         private static Dictionary<string, string> GlobalParams;
         private static Dictionary<string, string> newHashSet;
@@ -26,9 +25,9 @@ namespace ReposUploader
         private static string[] ForbbidenDirectories;
         private static string[] ForbbidenExtensions;
 
-        private static int CounterFilesChecked;
-        private static int CounterFilesZiped;
-        private static int CounterFilesUploaded;
+        private static int CounterFilesChecked = 0;
+        private static int CounterFilesZiped = 0;
+        private static int CounterFilesUploaded = 0;
 
         private static void Main(string[] args)
         {
@@ -42,7 +41,7 @@ namespace ReposUploader
             //the config file must be in the same location as this executable
             //TODO: check if file exist
             var configjson = File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + "\\Config.json");
-            GlobalParams = JsonConvert.Deserialize<Dictionary<string, string>>(configjson);
+            GlobalParams = JsonSerializer.Deserialize<Dictionary<string, string>>(configjson);
             //message if no directories or extensions are defined
             ForbbidenDirectories = GlobalParams["ForbbidenDirectories"].Split(',');
             ForbbidenExtensions = GlobalParams["ForbbidenExtensions"].Split(',');
@@ -104,12 +103,13 @@ namespace ReposUploader
 
             if (!ForceUploadAll && File.Exists(GlobalParams["GlobalHashLocation"]))
             {
-                prevHashSet = JsonConvert.Deserialize<Dictionary<string, string>>(File.ReadAllText(GlobalParams["GlobalHashLocation"]));
+                prevHashSet = JsonSerializer.Deserialize<Dictionary<string, string>>(File.ReadAllText(GlobalParams["GlobalHashLocation"]));
             }
             else
             {
                 prevHashSet = new Dictionary<string, string>();
             }
+
 
             var _binaryDirectory = new DirectoryInfo(GlobalParams["binPath"]);
 
@@ -143,13 +143,13 @@ namespace ReposUploader
             };
             pack.Publisher = pub;
 
-            var result = JsonConvert.Serialize(pack);
+            var result = JsonSerializer.Serialize(pack);
 
             File.WriteAllText(Path.GetTempPath() + @"\tempOut\local.json", result);
 
             if (CounterFilesUploaded > 0)
             {
-                var hashes = JsonConvert.Serialize(newHashSet);
+                var hashes = JsonSerializer.Serialize(newHashSet);
                 File.WriteAllText(GlobalParams["GlobalHashLocation"], hashes);
                 if (!NoUpload)
                 {
@@ -220,7 +220,7 @@ namespace ReposUploader
 
             var completePath = Path.GetTempPath() + @"\tempOut\release\" + _directory + f.Name;
 
-            var p1 = new PackFile
+            var p1 = new PackFile()
             {
                 Name = f.Name,
                 Hash = Hash(f.OpenRead()),
@@ -235,6 +235,7 @@ namespace ReposUploader
 
             if (ForceUploadAll || !_noFileChanges)
             {
+                // Console.WriteLine();
                 Console.Write(timer.Elapsed.ToString() + " " + f.Name + " - " + f.Length + "b .");
 
                 f.CopyTo(completePath);
@@ -268,25 +269,34 @@ namespace ReposUploader
         private static void UploadToFTP(string completePath, string _rutaArriba)
         {
             ManualResetEvent waitObject;
+
             FtpState state = new FtpState();
             FtpWebRequest request = (FtpWebRequest)WebRequest.Create(_rutaArriba);
             request.Method = WebRequestMethods.Ftp.UploadFile;
+
             request.Credentials = new NetworkCredential(GlobalParams["ftpUser"], GlobalParams["ftpPassword"]);
             state.Request = request;
             state.FileName = completePath;
+
             waitObject = state.OperationComplete;
+
+            // Asynchronously get the stream for the file contents.
             request.BeginGetRequestStream(
                 new AsyncCallback(EndGetStreamCallback),
                 state
-            );            
-            waitObject.WaitOne();            
+            );
+
+            // Block the current thread until all operations are complete.
+            waitObject.WaitOne();
+
+            // The operations either completed or threw an exception.
             if (state.OperationException != null)
             {
                 throw state.OperationException;
             }
             else
             {
-                Console.WriteLine("OK");
+                Console.WriteLine("The operation completed - {0}", state.StatusDescription);
             }
 
             CounterFilesUploaded++;
@@ -295,10 +305,13 @@ namespace ReposUploader
         private static void EndGetStreamCallback(IAsyncResult ar)
         {
             FtpState state = (FtpState)ar.AsyncState;
+
             Stream requestStream = null;
+            // End the asynchronous call to get the request stream.
             try
             {
                 requestStream = state.Request.EndGetRequestStream(ar);
+                // Copy the file contents to the request stream.
                 const int bufferLength = 2048;
                 byte[] buffer = new byte[bufferLength];
                 int count = 0;
@@ -311,16 +324,23 @@ namespace ReposUploader
                     count += readBytes;
                 }
                 while (readBytes != 0);
+                Console.WriteLine("Writing {0} bytes to the stream.", count);
+                // IMPORTANT: Close the request stream before sending the request.
                 requestStream.Close();
+                // Asynchronously get the response to the upload request.
                 state.Request.BeginGetResponse(
                     new AsyncCallback(EndGetResponseCallback),
                     state
                 );
             }
+
+            // Return exceptions to the main application thread.
             catch (Exception e)
             {
+                Console.WriteLine("Could not get the request stream.");
                 state.OperationException = e;
                 state.OperationComplete.Set();
+                return;
             }
         }
 
@@ -332,10 +352,15 @@ namespace ReposUploader
                 var response = (FtpWebResponse)state.Request.EndGetResponse(ar);
                 response.Close();
                 state.StatusDescription = response.StatusDescription;
+                // Signal the main application thread that
+                // the operation is complete.
                 state.OperationComplete.Set();
             }
+
+            // Return exceptions to the main application thread.
             catch (Exception e)
             {
+                Console.WriteLine("Error getting response.");
                 state.OperationException = e;
                 state.OperationComplete.Set();
             }
