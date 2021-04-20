@@ -42,7 +42,7 @@ namespace ReposUploader
             //TODO: check if file exist
             var configjson = File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + "\\Config.json");
             GlobalParams = JsonSerializer.Deserialize<Dictionary<string, string>>(configjson);
-            //message if no directories or extensions are defined
+            //TODO: show message if no directories or extensions are defined
             ForbbidenDirectories = GlobalParams["ForbbidenDirectories"].Split(',');
             ForbbidenExtensions = GlobalParams["ForbbidenExtensions"].Split(',');
             //TODO: if ftp password is not defined, ask for it in the console input
