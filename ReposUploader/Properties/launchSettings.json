@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ReposUploader": {
+      "commandName": "Project",
+      "commandLineArgs": "/noupload"
+    }
+  }
+}

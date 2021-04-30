@@ -1,10 +1,15 @@
 ﻿using System.Collections.Generic;
-using System.Runtime.InteropServices;
 
-namespace ReposUploader
-{   
-    public class PackDir 
+namespace ReposUpdate
+{
+    public class PackDir
     {
+        public PackDir()
+        {
+            this.PackFiles = new List<PackFile>();
+            this.PackDirs = new List<PackDir>();
+        }
+
         public string Name { get; set; }
         public long Size { get; set; }
         public List<PackFile> PackFiles { get; set; }

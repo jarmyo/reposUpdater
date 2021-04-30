@@ -29,8 +29,11 @@ namespace ReposUploader
         private static int CounterFilesZiped = 0;
         private static int CounterFilesUploaded = 0;
 
+
         private static void Main(string[] args)
         {
+            ForceUploadAll = false;
+            NoUpload = false;
             LoadConfig();
             CheckParams(args);
             CreateUpdatePack();
@@ -38,15 +41,20 @@ namespace ReposUploader
 
         private static void LoadConfig()
         {
+
             //the config file must be in the same location as this executable
             //TODO: check if file exist
             var configjson = File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + "\\Config.json");
             GlobalParams = JsonSerializer.Deserialize<Dictionary<string, string>>(configjson);
-            //TODO: show message if no directories or extensions are defined
-            ForbbidenDirectories = GlobalParams["ForbbidenDirectories"].Split(',');
-            ForbbidenExtensions = GlobalParams["ForbbidenExtensions"].Split(',');
-            //TODO: if ftp password is not defined, ask for it in the console input
-            //TODO: some params are required, so check.
+            //message if no directories or extensions are defined
+
+            if (GlobalParams != null)
+            {
+                ForbbidenDirectories = GlobalParams["ForbbidenDirectories"].Split(',');
+                ForbbidenExtensions = GlobalParams["ForbbidenExtensions"].Split(',');
+                //TODO: if ftp password is not defined, ask for it in the console input
+                //TODO: some params are required, so check.
+            }
         }
 
         private static void CheckParams(string[] args)
@@ -97,6 +105,10 @@ namespace ReposUploader
 
         public static void CreateUpdatePack()
         {
+            string binPath = string.Empty;
+            if (GlobalParams == null)
+                return;
+
             PrepareDirectories();
             timer = Stopwatch.StartNew();
             newHashSet = new Dictionary<string, string>();
@@ -110,9 +122,10 @@ namespace ReposUploader
                 prevHashSet = new Dictionary<string, string>();
             }
 
-            var _binaryDirectory = new DirectoryInfo(GlobalParams["binPath"]);
+            binPath = GlobalParams["binPath"];
+            var _binaryDirectory = new DirectoryInfo(binPath);
 
-            DeployPack pack = new DeployPack();
+            DeployPack pack = new();
             CounterFilesChecked = 0;
             CounterFilesZiped = 0;
             CounterFilesUploaded = 0;
@@ -152,7 +165,7 @@ namespace ReposUploader
                 File.WriteAllText(GlobalParams["GlobalHashLocation"], hashes);
                 if (!NoUpload)
                 {
-                    UploadToFTP(Path.GetTempPath() + @"\tempOut\local.json", "ftp://" + GlobalParams["ftpAddress"] + "/" + GlobalParams["ftpAppDir"] + "/local.json.deploy");
+                    UploadToFTP(Path.GetTempPath() + @"\tempOut\local.json", "ftp://" + GlobalParams["ftpAddress"] + "/" + GlobalParams["ftpAppDir"] + "/pack.json.deploy");
                 }
             }
 
@@ -183,22 +196,28 @@ namespace ReposUploader
                 _localDirectory.Create();
             }
 
-            foreach (var _archivoBuild in _dir.GetFiles())
+
+            if (ForbbidenExtensions != null)
             {
-                if (!ForbbidenExtensions.Contains(_archivoBuild.Extension))
+                foreach (var _archivoBuild in _dir.GetFiles())
                 {
-                    var g1 = CheckFile(_archivoBuild, _directory);
-                    DirectorySize += g1.Size;
-                    _thisPackDir.PackFiles.Add(g1);
+
+                    if (!ForbbidenExtensions.Contains(_archivoBuild.Extension))
+                    {
+                        var g1 = CheckFile(_archivoBuild, _directory);
+                        DirectorySize += g1.Size;
+                        _thisPackDir.PackFiles.Add(g1);
+                    }
                 }
             }
 
             foreach (var _subdirectorioBuild in _dir.GetDirectories())
             {
-                if (ForbbidenDirectories.Contains(_subdirectorioBuild.Name))
-                {
-                    continue;
-                }
+                if (ForbbidenDirectories != null)
+                    if (ForbbidenDirectories.Contains(_subdirectorioBuild.Name))
+                    {
+                        continue;
+                    }
 
                 var g = GetDir(_subdirectorioBuild, _directory + _subdirectorioBuild.Name);
                 DirectorySize += g.Size;
@@ -225,6 +244,16 @@ namespace ReposUploader
                 Hash = Hash(f.OpenRead()),
                 Size = f.Length
             };
+
+            if (newHashSet == null)
+                newHashSet = new Dictionary<string, string>();
+
+            if (prevHashSet == null)
+                prevHashSet = new Dictionary<string, string>();
+
+            if (timer == null)
+                timer = new Stopwatch();
+
 
             newHashSet.Add(completePath, p1.Hash);
             var _noFileChanges = prevHashSet.ContainsKey(completePath)
@@ -253,8 +282,11 @@ namespace ReposUploader
 
                 if (!NoUpload)
                 {
-                    var _rutaArriba = "ftp://" + GlobalParams["ftpAddress"] + "/" + GlobalParams["ftpAppDir"] + "/release/" + _directory.Replace("\\", "/") + f.Name;
-                    UploadToFTP(completePath + ".zip", _rutaArriba + ".zip");
+                    if (GlobalParams != null)
+                    {
+                        var _rutaArriba = "ftp://" + GlobalParams["ftpAddress"] + "/" + GlobalParams["ftpAppDir"] + "/release/" + _directory.Replace("\\", "/") + f.Name;
+                        UploadToFTP(completePath + ".zip", _rutaArriba + ".zip");
+                    }
                 }
             }
             else
@@ -267,12 +299,15 @@ namespace ReposUploader
 
         private static void UploadToFTP(string completePath, string _rutaArriba)
         {
+            if (GlobalParams == null)
+                return;
+
             ManualResetEvent waitObject;
 
-            FtpState state = new FtpState();
+            FtpState state = new();
             FtpWebRequest request = (FtpWebRequest)WebRequest.Create(_rutaArriba);
             request.Method = WebRequestMethods.Ftp.UploadFile;
-
+                        
             request.Credentials = new NetworkCredential(GlobalParams["ftpUser"], GlobalParams["ftpPassword"]);
             state.Request = request;
             state.FileName = completePath;
@@ -295,7 +330,7 @@ namespace ReposUploader
             }
             else
             {
-                Console.WriteLine("The operation completed - {0}", state.StatusDescription);
+                //Console.WriteLine("The operation completed - {0}", state.StatusDescription);
             }
 
             CounterFilesUploaded++;
@@ -303,6 +338,9 @@ namespace ReposUploader
 
         private static void EndGetStreamCallback(IAsyncResult ar)
         {
+            if (ar.AsyncState == null)
+                return;
+
             FtpState state = (FtpState)ar.AsyncState;
 
             Stream requestStream = null;
@@ -323,7 +361,7 @@ namespace ReposUploader
                     count += readBytes;
                 }
                 while (readBytes != 0);
-                Console.WriteLine("Writing {0} bytes to the stream.", count);
+                Console.WriteLine("-->{0}", count);
                 // IMPORTANT: Close the request stream before sending the request.
                 requestStream.Close();
                 // Asynchronously get the response to the upload request.
@@ -345,11 +383,18 @@ namespace ReposUploader
 
         private static void EndGetResponseCallback(IAsyncResult ar)
         {
+            if (ar.AsyncState == null)
+                return;
+
             FtpState state = (FtpState)ar.AsyncState;
             try
             {
                 var response = (FtpWebResponse)state.Request.EndGetResponse(ar);
                 response.Close();
+
+                if (response.StatusDescription == null)
+                    return;
+
                 state.StatusDescription = response.StatusDescription;
                 // Signal the main application thread that
                 // the operation is complete.

@@ -1,31 +1,18 @@
 ﻿using Microsoft.Win32;
-using ReposUploader;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
-using System.Web.Script.Serialization;
+using System.Text.Json;
 using System.Windows;
 using static ReposUpdate.Common;
 
 namespace ReposUpdate
 {
-
-    public static class MainApp
-    {
-        [STAThread]
-        public static void Main(string[] args)
-        {            
-            var a = new App();
-            a.Run();
-        }
-
-    }
-
     /// <summary>
     /// Updater.
     /// </summary>
-    public class App : Application
+    public partial class App : Application
     {
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -42,12 +29,13 @@ namespace ReposUpdate
             }
             else
             {
-                InitEnvironment();
-                if (FindNewVersion())
+                this.InitEnvironment();
+
+                if (this.FindNewVersion())
                 {
                     Logger.Write("new version Found");
                     Current.MainWindow = new MainWindow();
-                    Current.MainWindow.Show();                    
+                    Current.MainWindow.Show();
                 }
                 else
                 {
@@ -111,8 +99,7 @@ namespace ReposUpdate
         private bool FindNewVersion()
         {
             try
-            {
-                var JsonConvert = new JavaScriptSerializer();
+            {               
                 DownloadAllFiles = false;
                 var remoteString = remoteStringPath + updateFileName + ".json.deploy";
                 WebClient client = new WebClient();
@@ -121,14 +108,15 @@ namespace ReposUpdate
                     Logger.Write("first instalation detected");
                     client.DownloadFile(remoteString, PathUpdate + updateFileName + "_temp.json");
                     DownloadAllFiles = true;
-                    local = JsonConvert.Deserialize<DeployPack>(File.ReadAllText(PathUpdate + updateFileName + "_temp.json"));
+                    var localFileContent = File.ReadAllText(PathUpdate + updateFileName + "_temp.json");
+                    local = JsonSerializer.Deserialize<DeployPack>(localFileContent);
                 }
                 else
                 {
-                    local = JsonConvert.Deserialize<DeployPack>(File.ReadAllText(PathUpdate + updateFileName + ".json"));
+                    local = JsonSerializer.Deserialize<DeployPack>(File.ReadAllText(PathUpdate + updateFileName + ".json"));
                 }
 
-                remote = JsonConvert.Deserialize<DeployPack>(client.DownloadString(remoteString));
+                remote = JsonSerializer.Deserialize<DeployPack>(client.DownloadString(remoteString));
                 return remote.DateTime > local.DateTime || DownloadAllFiles;
             }
             catch (Exception eer)

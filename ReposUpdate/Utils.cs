@@ -24,7 +24,8 @@ namespace ReposUpdate
 
         internal static void CopyMeToInstallPath()
         {
-            var newpath = Common.InstalationPath + AppDomain.CurrentDomain.FriendlyName;
+            var exeName = AppDomain.CurrentDomain.FriendlyName + ".exe";
+            var newpath = Common.InstalationPath + exeName;
 
             if (File.Exists(newpath))
             {
@@ -32,7 +33,7 @@ namespace ReposUpdate
                 var or = nuevo.OpenRead();
                 var _actual = Hash(or);
                 or.Dispose();
-                var oo = new FileInfo(AppDomain.CurrentDomain.BaseDirectory + "\\" + AppDomain.CurrentDomain.FriendlyName);
+                var oo = new FileInfo(AppDomain.CurrentDomain.BaseDirectory + "\\" + exeName);
                 var or2 = oo.OpenRead();
                 var nuevo1 = Hash(or2);
                 or2.Dispose();
@@ -44,7 +45,7 @@ namespace ReposUpdate
                 nuevo.Delete();
             }
 
-            File.Copy(AppDomain.CurrentDomain.BaseDirectory + "\\" + AppDomain.CurrentDomain.FriendlyName, newpath);
+            File.Copy(AppDomain.CurrentDomain.BaseDirectory + "\\" + exeName, newpath);
         }
     }
 }

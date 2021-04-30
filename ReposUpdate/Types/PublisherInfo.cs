@@ -1,13 +1,16 @@
-﻿using System.Runtime.InteropServices;
-
-namespace ReposUploader
+﻿namespace ReposUpdate
 {
-    public class PublisherInfo 
+    public class PublisherInfo
     {
-        public string Name { get; set; }
-        public string SupportLink { get; set; }
-        public string SupportMail { get; set; }
-        public string SupportPhone { get; set; }
-        public string WebLink { get; set; }
+        private string name;
+        private string webLink;
+        private string supportLink;
+        private string supportPhone;
+        private string supportMail;
+        public string Name { get => name; set => name = value; }
+        public string SupportLink { get => supportLink; set => supportLink = value; }
+        public string SupportPhone { get => supportPhone; set => supportPhone = value; }
+        public string SupportMail { get => supportMail; set => supportMail = value; }
+        public string WebLink { get => webLink; set => webLink = value; }
     }
 }

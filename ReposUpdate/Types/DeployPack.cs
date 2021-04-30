@@ -1,11 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 
-namespace ReposUploader
-{    
-    public class DeployPack 
+namespace ReposUpdate
+{
+    public class DeployPack
     {
+        public DeployPack()
+        {
+            this.PackFiles = new List<PackFile>();
+            this.PackDirs = new List<PackDir>();
+        }
+
         public string MainVer { get; set; }
         public DateTime DateTime { get; set; }
         public long Size { get; set; }

@@ -11,7 +11,7 @@ using System.Windows;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Repos Software")]
 [assembly: AssemblyProduct("Repos Restaurante")]
-[assembly: AssemblyCopyright("Copyright © repos software 2020")]
+[assembly: AssemblyCopyright("Copyright © repos software 2021")]
 [assembly: AssemblyTrademark("repos.mx")]
 [assembly: AssemblyCulture("")]
 [assembly: ComVisible(false)]

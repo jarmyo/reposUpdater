@@ -6,14 +6,14 @@ namespace ReposUploader
 {   
         public class FtpState : IDisposable
         {
-            private ManualResetEvent wait;
+            private readonly ManualResetEvent wait;
             private FtpWebRequest request;
             private string fileName;
             private Exception operationException;
             string status;
 
             public FtpState()
-            {
+            {              
                 this.wait=new ManualResetEvent(false);
             }
 
@@ -24,30 +24,45 @@ namespace ReposUploader
 
             public FtpWebRequest Request
             {
-                get { return this.request; }
+                get {
+                if (this.request == null)
+                    this.request = (FtpWebRequest) FtpWebRequest.Create("");
+                return this.request; }
                 set { this.request=value; }
             }
 
             public string FileName
             {
-                get { return this.fileName; }
+                get {
+                if (this.fileName == null)
+                    this.fileName = string.Empty;
+                return this.fileName; }
                 set { this.fileName=value; }
             }
 
             public Exception OperationException
             {
-                get { return this.operationException; }
+                get {
+                //if (this.operationException == null)
+                //    this.operationException = new Exception();
+                return this.operationException;
+            }
                 set { this.operationException=value; }
             }
 
             public string StatusDescription
             {
-                get { return this.status; }
+                get {
+                if (this.status == null)
+                    this.status = string.Empty;                
+                return this.status;
+            }
                 set { this.status=value; }
             }
 
             public void Dispose()
-            {                
+            {
+            GC.SuppressFinalize(this);
             }
         }
     }
